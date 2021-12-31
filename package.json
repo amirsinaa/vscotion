@@ -10,14 +10,33 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:vscotion.helloWorld"
+		"onCommand:vscotion.addIntegrationKey",
+		"onCommand:vscotion.showCurrentIntegrationKey"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
+		"configuration": {
+			"title": "vscotion",
+			"properties": {
+				"vscotion.IntegrationKey": {
+					"type": "string",
+					"default": "",
+					"description": "Please set your Notion Integration Key",
+					"link": "https://www.vscotion.so/my-integrations/",
+					"scope": "window"
+				}
+			}
+		},
 		"commands": [
 			{
-				"command": "vscotion.helloWorld",
-				"title": "Hello World"
+				"command": "vscotion.addIntegrationKey",
+				"title": "VSCotion: Add Notion Integration Key",
+				"icon": "$(key)"
+			},
+			{
+				"command": "vscotion.showCurrentIntegrationKey",
+				"title": "VSCotion: Show current Notion Integration Key",
+				"icon": "$(eye)"
 			}
 		]
 	},
