@@ -47,5 +47,8 @@
 		"webpack": "^5.65.0",
 		"webpack-cli": "^4.9.1",
 		"@vscode/test-electron": "^2.0.1"
+	},
+	"dependencies": {
+		"@notionhq/client": "^0.2.3"
 	}
 }
