@@ -43,3 +43,8 @@ export interface Properties {
 export interface Title {
   id: string
 }
+
+export type NotionAvailablePages = {
+  pageTitle: string,
+  pageId: string
+};
