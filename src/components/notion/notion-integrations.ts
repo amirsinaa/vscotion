@@ -1,16 +1,26 @@
-import * as vscode from "vscode";
+import { ExtensionContext, SecretStorage, window } from 'vscode';
 
-export const CreateHumanReadableOutputChannel = vscode.window.createOutputChannel("vscotion");
+export const CreateHumanReadableOutputChannel = window.createOutputChannel('vscotion');
+export class Auth {
+  private static _instance: Auth;
 
-export const SetNotionSoIntegrationsKey = (IntegrationKey: string) =>
-  vscode.workspace.getConfiguration().update("vscotion.IntegrationKey", IntegrationKey, vscode.ConfigurationTarget.Global);
+  constructor(private secretStorage: SecretStorage) { }
 
-export const GetNotionSoIntegrationsKey = (): string => {
-  const integrationKey = vscode.workspace.getConfiguration("vscotion").get("IntegrationKey", "");
-  if (!integrationKey) {
-    vscode.window.showInformationMessage("You haven't set your notion integration key yet. do you want to ?", "Yes", "No").then(answer => {
-      answer === "Yes" ? vscode.commands.executeCommand("vscotion.addIntegrationKey") : "";
-    });
+  static init(context: ExtensionContext): void {
+    Auth._instance = new Auth(context.secrets);
   }
-  return integrationKey;
-};
+
+  static get instance(): Auth {
+    return Auth._instance;
+  }
+
+  async storeNotionToken(token?: string): Promise<void> {
+    if (token) {
+      this.secretStorage.store('notion_integration_key', token);
+    }
+  }
+
+  async getNotionToken(): Promise<string | undefined> {
+    return await this.secretStorage.get('notion_integration_key');
+  }
+}
