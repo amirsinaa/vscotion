@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="./.github/images/icons/icon.ong" />
+</p>
+
 # VSCotion
 
 Vscotion is a Visual studio code extension to make a code snippet from the currently open file in vscode to your Notion account.
@@ -25,16 +29,9 @@ Notion integrations don't have access to any pages in the workspace at first. A 
 - Type `VSCotion: Add Notion Integration Key` and enter
 - Paste your integration key from step 1 here and enter
 
-
-![Step 1](images/howto.gif)
+![Step 1](./.github/images/howto.gif)
 That's it. from now on when you want to make a snippet from a code you're working on you only need to open the command palette and type  `VSCotion: Save snippet to notion` then a list of pages that you have shared with your integration will popup. select a page and give your snippet a name and submit.
 A new child page will be created on the chosen page with a code block .
-
-## VScode extension guidelines
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Notion API document
-* [Notion API document](https://developers.notion.com/docs)
 
 ## Disclaimer
 Logo for this extension has been created with ![DALL·E mini](https://huggingface.co/spaces/dalle-mini/dalle-mini) via `Notion application logo merged with visual studio code application logo`
