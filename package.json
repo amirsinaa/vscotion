@@ -1,10 +1,14 @@
 {
 	"name": "vscotion",
 	"displayName": "vscotion",
-	"description": " Vscotion is a Visual studio code extension to make a code snippet from the currently open file in vscode to your Notion account. ",
+	"description": "Vscotion is a Visual studio code extension to make a code snippet from the currently open file in vscode to your Notion account. ",
 	"version": "0.1.0",
 	"engines": {
 		"vscode": "^1.70.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/amirsinaa/vscotion"
 	},
 	"categories": [
 		"Snippets",
@@ -14,24 +18,10 @@
 	"activationEvents": [
 		"onCommand:vscotion.addIntegrationKey",
 		"onCommand:vscotion.showCurrentIntegrationKey",
-		"onCommand:vscotion.setNotionPage",
-		"onCommand:vscotion.scanDocument",
 		"onCommand:vscotion.saveToNotion"
 	],
 	"main": "./dist/extension.js",
 	"contributes": {
-		"configuration": {
-			"title": "vscotion",
-			"properties": {
-				"vscotion.IntegrationKey": {
-					"type": "string",
-					"default": "",
-					"description": "Please set your Notion Integration Key",
-					"link": "https://www.notion.so/my-integrations/",
-					"scope": "window"
-				}
-			}
-		},
 		"commands": [
 			{
 				"command": "vscotion.addIntegrationKey",
@@ -46,17 +36,7 @@
 			{
 				"command": "vscotion.saveToNotion",
 				"title": "VSCotion: Save snippet to notion",
-				"icon": "${eye}"
-			},
-			{
-				"command": "vscotion.setNotionPage",
-				"title": "VSCotion: Select target page",
-				"icon": "$(eye)"
-			},
-			{
-				"command": "vscotion.scanDocument",
-				"title": "VSCotion: Scan Document",
-				"icon": "$(eye)"
+				"icon": "${save}"
 			}
 		]
 	},
