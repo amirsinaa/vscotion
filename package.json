@@ -3,7 +3,8 @@
 	"displayName": "vscotion",
 	"description": "Vscotion is a Visual studio code extension to make a code snippet from the currently open file in vscode to your Notion account. ",
 	"publisher": "amirsina",
-	"version": "0.1.0",
+	"icon": ".github/images/icons/icon.png",
+	"version": "0.1.1",
 	"engines": {
 		"vscode": "^1.70.2"
 	},
