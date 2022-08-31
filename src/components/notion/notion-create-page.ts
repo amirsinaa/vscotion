@@ -1,42 +1,40 @@
-import { GetNotionSoIntegrationsKey } from './notion-integrations';
-import { Client } from "@notionhq/client";
 import { CreatePageResponse } from '@notionhq/client/build/src/api-endpoints';
-import { NotionSupportedLanguages } from "./types/notion-supported-languages"
+import { NotionSupportedLanguages } from './types/notion-supported-languages';
+import { purifyLanguageType } from '../../utilities/purify-language-type';
 
-const notion = new Client({ auth: GetNotionSoIntegrationsKey() });
-
-export const CreateNotionSnippetPage = async (parentId: string, pageTitle: string, codeContent: string, codeLanguage: NotionSupportedLanguages): Promise<CreatePageResponse> => {
-  const snippetPage = await notion.pages.create({
-    "parent": {
-      "type": "page_id",
-      "page_id": parentId
+export const CreateNotionSnippetPage = async (notionInstace: any, parentId: string, pageTitle: string, codeContent: string, codeLanguage: NotionSupportedLanguages): Promise<CreatePageResponse> => {
+  const snippetPage = await notionInstace.pages.create({
+    'parent': {
+      'type': 'page_id',
+      'page_id': parentId
     },
 
-    "properties": {
-      "title": [
+    'properties': {
+      'title': [
         {
-          "text": {
-            "content": pageTitle
+          'text': {
+            'content': pageTitle
           }
         }
       ]
     },
 
-    "children": [
+    'children': [
       {
-        "type": "code",
-        "object": "block",
-        "code": {
-          "rich_text": [{
-            "type": "text",
-            "text": {
-              "content": codeContent
+        'type': 'code',
+        'object': 'block',
+        'code': {
+          'rich_text': [{
+            'type': 'text',
+            'text': {
+              'content': codeContent
             }
           }],
-          "language": codeLanguage
+          'language': purifyLanguageType(codeLanguage)
         }
       }
     ]
   });
-  return snippetPage;
+  if (pageTitle.length !== 0 || parentId.length !== 0) { return snippetPage; }
+  throw Error('Operation cancled');
 };
