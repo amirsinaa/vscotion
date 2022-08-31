@@ -9,7 +9,10 @@ Vscotion is a Visual studio code extension to make a code snippet from the curre
 To use this extension you need to follow below steps :
 
 ## ![Step 1: Create a Notion integration.](https://developers.notion.com/docs#step-1-create-an-integration)
+
 ![Step 1](https://files.readme.io/2ec137d-093ad49-create-integration.gif)
+> gif from https://developers.notion.com/docs#step-1-create-an-integration
+
 - Go to https://www.notion.com/my-integrations.
 - Click the "+ New integration" button.
 - Give your integration a name - (e.g., vscotion)
