@@ -1,90 +1,79 @@
-import * as vscode from "vscode";
-import { VsCodeSetInputBox } from "./components/vscode-elements";
+import { PostPage } from './components/notion/types/notion-submit-page-request';
+import { VsCodeSetInputBox, GetVScodeFileContent } from './components/vscode-elements';
 import {
-	GetNotionSoIntegrationsKey,
-	SetNotionSoIntegrationsKey,
 	CreateNotionSnippetPage,
-	GetNotionPagesList,
-} from "./components/notion";
-
-type NotionAvailablePages = {
-	pageTitle: string,
-	pageId: string
-};
-
+	SetNotionParentPage,
+	Auth,
+} from './components/notion';
+import { Client } from '@notionhq/client';
+import * as vscode from 'vscode';
 
 export function activate(context: vscode.ExtensionContext) {
-	let disposables: vscode.Disposable[] = [];
+	Auth.init(context);
+	const notionIntegration = Auth.instance;
 
-	disposables.push(
-		vscode.commands.registerCommand("vscotion.addIntegrationKey", async () => {
-			const notionIntegrationKey: string = GetNotionSoIntegrationsKey();
-			const userIntegrationKeyInput = await VsCodeSetInputBox("Enter Your Integration Key", notionIntegrationKey);
+	context.subscriptions.push(
+		vscode.commands.registerCommand('vscotion.addIntegrationKey', async () => {
+			const notionIntegrationKey: string | undefined = await notionIntegration.getNotionToken();
+			const userIntegrationKeyInput = await VsCodeSetInputBox('Enter Your Integration Key', notionIntegrationKey);
 			if (userIntegrationKeyInput) {
-				SetNotionSoIntegrationsKey(userIntegrationKeyInput);
+				await notionIntegration.storeNotionToken(userIntegrationKeyInput);
 			}
 		})
 	);
 
-	disposables.push(vscode.commands.registerCommand('vscotion.showCurrentIntegrationKey', () => {
-		const notionIntegrationKey: string = GetNotionSoIntegrationsKey();
-		vscode.window.showInformationMessage(notionIntegrationKey);
+	context.subscriptions.push(vscode.commands.registerCommand('vscotion.showCurrentIntegrationKey', async (): Promise<string | undefined> => {
+		const notionIntegrationKey: string | undefined = await notionIntegration.getNotionToken();
+		vscode.window.showInformationMessage(`${notionIntegrationKey}`);
+		return notionIntegrationKey;
 	})
 	);
 
-	disposables.push(
-		vscode.commands.registerCommand("vscotion.setNotionPage", async () => {
-			const pages: NotionAvailablePages[] = await GetNotionPagesList();
-			const pagesSelectBox = pages.map(item => item.pageTitle);
-
-			return await vscode.window.showQuickPick(pagesSelectBox, {
-				placeHolder: 'Please first select a page to store your snippets',
-			}).then(selectedItem => {
-				const selectedPage = pages.find(page => page.pageTitle === selectedItem)
-				return selectedPage?.pageId
-			});
-			// return result;
-			// vscode.window.showInformationMessage(`Got: ${result} , ${pages}`);
-		})
-	);
-
-	disposables.push(
+	context.subscriptions.push(
 		vscode.commands.registerCommand('vscotion.scanDocument', () => {
-			const editor = vscode.window.activeTextEditor
+			const editor = vscode.window.activeTextEditor;
 			if (editor) {
 				return {
 					code: editor.document.getText(),
 					language: editor.document.languageId
-				}
+				};
 			}
-			throw Error("You can't make a snippet from nothing!")
-		}
-		)
+		})
 	);
 
-	disposables.push(
-		vscode.commands.registerCommand('vscotion.saveToNotion', async () => {
-			const parentPageId: string = await vscode.commands.executeCommand('vscotion.setNotionPage') ?? ''
+	context.subscriptions.push(
+		vscode.commands.registerCommand('vscotion.prepareNotionRequest', async (): Promise<PostPage> => {
+			const notionIntegrationKey: string | undefined = await notionIntegration.getNotionToken();
+			const notion = new Client({ auth: notionIntegrationKey });
+			const parentPageId = await SetNotionParentPage(notion) ?? '';
 
-			// vscode.window.showInformationMessage(`${parentPageId}`)
-
-			const pageTitle: string = await vscode.window.showInputBox({
-				title: "Please type your snippet title",
-				value: "My awesome snippet"
+			const pageTitle = await vscode.window.showInputBox({
+				title: 'Please type your snippet title',
+				value: 'My awesome snippet'
 			}) ?? '';
 
-			const snippet: any = await vscode.commands.executeCommand('vscotion.scanDocument')
+			const snippet: any = GetVScodeFileContent();
 
-			// vscode.window.showInformationMessage(JSON.stringify(pageTitle))
+			return {
+				id: parentPageId,
+				title: pageTitle,
+				code: snippet.code,
+				language: snippet.language
+			};
+		})
+	);
 
-			const postsnippet = await CreateNotionSnippetPage(parentPageId, pageTitle, snippet.code, snippet.language)
 
-			// vscode.window.showInformationMessage(`${snippet.code}`)
-
-			vscode.window.showInformationMessage(JSON.stringify(postsnippet))
-
+	context.subscriptions.push(
+		vscode.commands.registerCommand('vscotion.saveToNotion', async () => {
+			const notionIntegrationKey: string | undefined = await notionIntegration.getNotionToken();
+			const notion = new Client({ auth: notionIntegrationKey });
+			if (!!notionIntegrationKey) {
+				//@ts-ignore-nextline
+				vscode.commands.executeCommand('vscotion.prepareNotionRequest').then((request): PostPage => CreateNotionSnippetPage(notion, request.id, request.title, request.code, request.language));
+			} else {
+				vscode.commands.executeCommand('vscotion.addIntegrationKey');
+			}
 		})
 	);
 }
-
-export function deactivate() { }
