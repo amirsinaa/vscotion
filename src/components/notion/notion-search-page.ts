@@ -1,11 +1,8 @@
-import { GetNotionSoIntegrationsKey } from './notion-integrations';
-import { getPageTitleFromUrl } from "../../utilities";
-import { Client } from "@notionhq/client";
+import { NotionAvailablePages } from './types/notion-page-response';
+import { getPageTitleFromUrl } from '../../utilities';
 
-const notion = new Client({ auth: GetNotionSoIntegrationsKey() });
-
-export const GetNotionPagesList = async () => {
-  const accessiblePage = await notion.search({
+export const GetNotionPagesList = async (notionInstance: any): Promise<NotionAvailablePages[]> => {
+  const accessiblePage = await notionInstance.search({
     filter: {
       property: 'object',
       value: 'page'
@@ -15,8 +12,7 @@ export const GetNotionPagesList = async () => {
     throw Error('It seems you dont have access to any pages');
   }
 
-  return accessiblePage.results.map(item => {
-    // @ts-ignore: ignore due to notion interface
+  return accessiblePage.results.map((item: { id: string; url: string; }) => {
     const { id, url } = item;
     const title = getPageTitleFromUrl(url);
     return { pageTitle: title, pageId: id };
